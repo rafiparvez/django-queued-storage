@@ -8,6 +8,7 @@ from google.cloud.speech import enums
 from google.cloud.speech import types
 
 from pydub import AudioSegment
+import sox
 
 try:
     from celery.utils.log import get_task_logger
@@ -147,10 +148,14 @@ class TransferAndDelete(Transfer):
         client = speech.SpeechClient()
 
         # change format to flac
-        audio_file_raw= AudioSegment.from_file(
-            audioFile, format="raw", frame_rate=16000,
-            channels=1, sample_width=2)
-        audio_file_raw.export(audioFile, format="flac")
+
+        tfm = sox.Transformer()
+        tfm.build(audioFile, audioFile)
+
+        # audio_file_raw= AudioSegment.from_file(
+        #     audioFile, format="raw", frame_rate=16000,
+        #     channels=1, sample_width=2)
+        # audio_file_raw.export(audioFile, format="flac")
 
         # Loads the audio into memory
         with local.open(audioFile, 'rb') as audio_file:
