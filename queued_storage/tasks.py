@@ -177,7 +177,7 @@ class TransferAndDelete(Transfer):
 
         config = types.RecognitionConfig(
             encoding=enums.RecognitionConfig.AudioEncoding.FLAC,
-            sample_rate_hertz=16000,
+            # sample_rate_hertz=16000,
             language_code='en-IN')
 
         # Detects speech in the audio file
