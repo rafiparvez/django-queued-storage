@@ -139,7 +139,7 @@ class TransferAndDelete(Transfer):
         newfilename = str(filename).replace("audios/", "texts/")
         return newfilename
 
-    def audio_to_text(audioFile, textFile):
+    def audio_to_text(self, audioFile, textFile):
         print("INSIDE audio_to_text")
 
         # Instantiates a client
