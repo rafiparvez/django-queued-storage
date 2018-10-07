@@ -150,7 +150,8 @@ class TransferAndDelete(Transfer):
         # change format to flac
 
         tfm = sox.Transformer()
-        tfm.build(audioFile, audioFile)
+        flacPath = audioFile + ".flac"
+        tfm.build(audioFile, flacPath)
 
         # audio_file_raw= AudioSegment.from_file(
         #     audioFile, format="raw", frame_rate=16000,
@@ -158,7 +159,7 @@ class TransferAndDelete(Transfer):
         # audio_file_raw.export(audioFile, format="flac")
 
         # Loads the audio into memory
-        with local.open(audioFile, 'rb') as audio_file:
+        with local.open(flacPath, 'rb') as audio_file:
             content = audio_file.read()
             audio = types.RecognitionAudio(content=content)
 
