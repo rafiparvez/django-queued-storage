@@ -147,9 +147,8 @@ class TransferAndDelete(Transfer):
         client = speech.SpeechClient()
 
         # change format to flac
-        with local.open(audioFile, 'rb') as audio_file:
-            audio_file_mp3 = AudioSegment.from_mp3(audio_file)
-            audio_file_mp3.export(audio_file, format="flac")
+        audio_file_mp3 = AudioSegment.from_mp3(audioFile)
+        audio_file_mp3.export(audioFile, format="flac")
 
         # Loads the audio into memory
         with local.open(audioFile, 'rb') as audio_file:
