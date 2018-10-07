@@ -172,7 +172,7 @@ class TransferAndDelete(Transfer):
             print('Transcript: {}'.format(result.alternatives[0].transcript))
             textresult += result.alternatives[0].transcript
 
-        textresult = "Dummy Text"
+
         print(textresult)
         print("******* textresult works ******")
 
@@ -194,8 +194,7 @@ class TransferAndDelete(Transfer):
             result = super(TransferAndDelete, self).transfer(textfilename,
                                                               local,
                                                               remote, **kwargs)
-            if result:
-                local.delete(textfilename)
+            # if result:
+            #     local.delete(textfilename)
 
-            local.save(textfilename)
         return result
