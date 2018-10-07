@@ -165,13 +165,13 @@ class TransferAndDelete(Transfer):
             print('Transcript: {}'.format(result.alternatives[0].transcript))
             textresult += result.alternatives[0].transcript
 
+        textresult = "Dummy Text"
         print(textresult)
-
         print("******* textresult works ******")
 
-        local.save(textFile, textresult)
-        # with local.open(textFile, "w") as file:
-        #     file.write(textresult)
+        # local.save(textFile, textresult)
+        with local.open(textFile, "w") as textfile:
+            textfile.write(textresult)
 
     def transfer(self, name, local, remote, **kwargs):
         result = super(TransferAndDelete, self).transfer(name, local,
