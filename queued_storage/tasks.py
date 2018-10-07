@@ -149,6 +149,11 @@ class TransferAndDelete(Transfer):
 
         # change format to flac
 
+        os.rename(audioFile, audioFile+'.mp3')
+        audioFile = audioFile+'.mp3'
+
+        print("***** audioFile *********", audioFile)
+
         tfm = sox.Transformer()
         flacPath = audioFile + ".flac"
         tfm.build(audioFile, flacPath)
