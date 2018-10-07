@@ -148,8 +148,17 @@ class TransferAndDelete(Transfer):
         # The name of the audio file to transcribe
         file_name = audioFile
 
+        # script directory
+        script_dir = os.path.dirname(__file__)
+
+        print("******* script_dir ******", script_dir)
+
+        audioFile_path = os.path.join(script_dir, file_name)
+
+        print("******* audioFile_path ******", audioFile_path)
+
         # Loads the audio into memory
-        with io.open(file_name, 'rb') as audio_file:
+        with io.open(audioFile_path, 'rb') as audio_file:
             content = audio_file.read()
             audio = types.RecognitionAudio(content=content)
 
@@ -189,6 +198,13 @@ class TransferAndDelete(Transfer):
             #                           'output.txt'))
 
             self.audio_to_text(name, textfilename)
+
+            os.path.join(os.path.dirname(__file__), '..', name)
+
+            self.audio_to_text(os.path.join(
+                os.path.dirname(__file__), 'resources','output.flac'),
+                os.path.join(os.path.dirname(__file__), 'resources',
+                                      'output.txt'))
 
             result2 = super(TransferAndDelete, self).transfer(textfilename,
                                                               local,
