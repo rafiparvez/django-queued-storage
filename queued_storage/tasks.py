@@ -127,9 +127,35 @@ class TransferAndDelete(Transfer):
     file with the given name using the local storage if the transfer
     was successful.
     """
+    def generate_text_filename(self,filename):
+        newfilename = str(filename).replace("audios/", "texts/")
+        print ("****** NEW TEXT FILE******", newfilename)
+        return newfilename
+
     def transfer(self, name, local, remote, **kwargs):
         result = super(TransferAndDelete, self).transfer(name, local,
                                                          remote, **kwargs)
+
         if result:
             local.delete(name)
+        else:
+            return result
+
+        if "audios/" in str(name):
+            textfilename = self.generate_text_filename(name)
+
         return result
+
+
+# class TransferConvertAndDelete(Transfer):
+#     """
+#     A :class:`~queued_storage.tasks.Transfer` subclass which deletes the
+#     file with the given name using the local storage if the transfer
+#     was successful.
+#     """
+#     def transfer(self, name, local, remote, **kwargs):
+#         result = super(TransferConvertAndDelete, self).transfer(name, local,
+#                                                          remote, **kwargs)
+#         if result:
+#             local.delete(name)
+#         return result
