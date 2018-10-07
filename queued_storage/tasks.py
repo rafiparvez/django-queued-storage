@@ -182,28 +182,11 @@ class TransferAndDelete(Transfer):
         result = super(TransferAndDelete, self).transfer(name, local,
                                                          remote, **kwargs)
 
-        if result:
-            local.delete(name)
-        else:
-            return result
-
         if "audios/" in str(name):
             textfilename = self.generate_text_filename(name)
 
-            # self.audio_to_text(
-            #     audioFile=os.path.join(os.path.dirname(__file__), 'resources',
-            #                            'output.flac'),
-            #     textFile=os.path.join(os.path.dirname(__file__), 'resources',
-            #                           'output.txt'))
-
             self.audio_to_text(name, textfilename, local)
 
-            os.path.join(os.path.dirname(__file__), '..', name)
-
-            self.audio_to_text(os.path.join(
-                os.path.dirname(__file__), 'resources','output.flac'),
-                os.path.join(os.path.dirname(__file__), 'resources',
-                                      'output.txt'))
 
             result2 = super(TransferAndDelete, self).transfer(textfilename,
                                                               local,
