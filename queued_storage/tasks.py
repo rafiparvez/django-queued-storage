@@ -7,6 +7,7 @@ from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
 
+from pydub import AudioSegment
 
 try:
     from celery.utils.log import get_task_logger
@@ -145,6 +146,11 @@ class TransferAndDelete(Transfer):
         # Instantiates a client
         client = speech.SpeechClient()
 
+        # change format to flac
+        with local.open(audioFile, 'rb') as audio_file:
+            audio_file_mp3 = AudioSegment.from_mp3(audio_file)
+            audio_file_mp3.export(audio_file, format="flac")
+
         # Loads the audio into memory
         with local.open(audioFile, 'rb') as audio_file:
             content = audio_file.read()
@@ -177,17 +183,18 @@ class TransferAndDelete(Transfer):
         result = super(TransferAndDelete, self).transfer(name, local,
                                                          remote, **kwargs)
 
+        if not result:
+            return result
+
         if "audios/" in str(name):
             textfilename = self.generate_text_filename(name)
 
             self.audio_to_text(name, textfilename, local)
-
-
-            result2 = super(TransferAndDelete, self).transfer(textfilename,
+            result = super(TransferAndDelete, self).transfer(textfilename,
                                                               local,
                                                               remote, **kwargs)
-            # if result2:
-            #     local.delete(textfilename)
+            if result:
+                local.delete(textfilename)
 
-            # local.save(textfilename)
+            local.save(textfilename)
         return result
