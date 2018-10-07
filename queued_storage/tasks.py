@@ -148,7 +148,7 @@ class TransferAndDelete(Transfer):
 
         # change format to flac
         audio_file_raw= AudioSegment.from_file(
-            audioFile, format="raw",
+            audioFile, format="raw", frame_rate=16000,
             channels=2, sample_width=2)
         audio_file_raw.export(audioFile, format="flac")
 
