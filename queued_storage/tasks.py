@@ -1,10 +1,18 @@
 from django.core.cache import cache
-
 from celery.task import Task
+import io
+import os
+# Imports the Google Cloud client library
+from google.cloud import speech
+from google.cloud.speech import enums
+from google.cloud.speech import types
+
+
 try:
     from celery.utils.log import get_task_logger
 except ImportError:
     from celery.log import get_task_logger
+
 
 
 from .conf import settings
@@ -127,10 +135,40 @@ class TransferAndDelete(Transfer):
     file with the given name using the local storage if the transfer
     was successful.
     """
-    def generate_text_filename(self,filename):
+    def generate_text_filename(self, filename):
         newfilename = str(filename).replace("audios/", "texts/")
-        print ("****** NEW TEXT FILE******", newfilename)
         return newfilename
+
+    def audio_to_text(audioFile, textFile):
+        print("INSIDE audio_to_text")
+
+        # Instantiates a client
+        client = speech.SpeechClient()
+
+        # The name of the audio file to transcribe
+        file_name = audioFile
+
+        # Loads the audio into memory
+        with io.open(file_name, 'rb') as audio_file:
+            content = audio_file.read()
+            audio = types.RecognitionAudio(content=content)
+
+        config = types.RecognitionConfig(
+            encoding=enums.RecognitionConfig.AudioEncoding.FLAC,
+            sample_rate_hertz=16000,
+            language_code='en-IN')
+
+        # Detects speech in the audio file
+        response = client.recognize(config, audio)
+
+        textresult = ""
+        for result in response.results:
+            print('Transcript: {}'.format(result.alternatives[0].transcript))
+            textresult += result.alternatives[0].transcript
+
+        print(textresult)
+        with open(textFile, "w") as file:
+            file.write(textresult)
 
     def transfer(self, name, local, remote, **kwargs):
         result = super(TransferAndDelete, self).transfer(name, local,
@@ -144,18 +182,19 @@ class TransferAndDelete(Transfer):
         if "audios/" in str(name):
             textfilename = self.generate_text_filename(name)
 
+            # self.audio_to_text(
+            #     audioFile=os.path.join(os.path.dirname(__file__), 'resources',
+            #                            'output.flac'),
+            #     textFile=os.path.join(os.path.dirname(__file__), 'resources',
+            #                           'output.txt'))
+
+            self.audio_to_text(name, textfilename)
+
+            result2 = super(TransferAndDelete, self).transfer(textfilename,
+                                                              local,
+                                                              remote, **kwargs)
+            # if result2:
+            #     local.delete(textfilename)
+
+            # local.save(textfilename)
         return result
-
-
-# class TransferConvertAndDelete(Transfer):
-#     """
-#     A :class:`~queued_storage.tasks.Transfer` subclass which deletes the
-#     file with the given name using the local storage if the transfer
-#     was successful.
-#     """
-#     def transfer(self, name, local, remote, **kwargs):
-#         result = super(TransferConvertAndDelete, self).transfer(name, local,
-#                                                          remote, **kwargs)
-#         if result:
-#             local.delete(name)
-#         return result
