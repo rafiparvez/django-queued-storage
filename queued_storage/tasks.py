@@ -7,8 +7,6 @@ from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
 
-from pydub import AudioSegment
-import sox
 import ffmpy3
 
 try:
@@ -143,37 +141,24 @@ class TransferAndDelete(Transfer):
         return newfilename
 
     def audio_to_text(self, audioFile, textFile, local):
-        print("INSIDE audio_to_text")
 
         # Instantiates a client
         client = speech.SpeechClient()
 
         # change format to flac
-
         os.rename(audioFile, audioFile+'.webm')
         audioFilewebm = audioFile+'.webm'
         flacPath = audioFile + ".flac"
 
-        print("***** audioFile *********", audioFile)
-
-        # tfm = sox.Transformer()
-        # flacPath = audioFile + ".flac"
-        # tfm.build(audioFile, flacPath)
-
-        ff = ffmpy3.FFmpeg(inputs = {audioFilewebm: None}, outputs={flacPath: None})
+        ff = ffmpy3.FFmpeg(
+            inputs={audioFilewebm: None}, outputs={flacPath: None}
+        )
         ff.run()
-
-        # audio_file_raw= AudioSegment.from_file(
-        #     audioFile, format="raw", frame_rate=16000,
-        #     channels=1, sample_width=2)
-        # audio_file_raw.export(audioFile, format="flac")
 
         # Loads the audio into memory
         with local.open(flacPath, 'rb') as audio_file:
             content = audio_file.read()
             audio = types.RecognitionAudio(content=content)
-
-        print("******* local open pass ******")
 
         config = types.RecognitionConfig(
             encoding=enums.RecognitionConfig.AudioEncoding.FLAC,
@@ -189,8 +174,7 @@ class TransferAndDelete(Transfer):
             textresult += result.alternatives[0].transcript
 
 
-        print(textresult)
-        print("******* textresult works ******")
+        print('********',textresult,'*********')
 
         # local.save(textFile, textresult)
         with local.open(textFile, "w") as textfile:
