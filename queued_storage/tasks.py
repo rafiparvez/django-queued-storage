@@ -145,15 +145,6 @@ class TransferAndDelete(Transfer):
         # Instantiates a client
         client = speech.SpeechClient()
 
-        # script directory
-        # script_dir = os.path.dirname(__file__)
-
-        # print("******* script_dir ******", script_dir)
-
-        # audioFile_path = os.path.join(script_dir, file_name)
-
-        print("******* audioFile ******", audioFile)
-
         # Loads the audio into memory
         with local.open(audioFile, 'rb') as audio_file:
             content = audio_file.read()
@@ -175,8 +166,12 @@ class TransferAndDelete(Transfer):
             textresult += result.alternatives[0].transcript
 
         print(textresult)
-        with open(textFile, "w") as file:
-            file.write(textresult)
+
+        print("******* textresult works ******")
+
+        local.save(textFile, textresult)
+        # with local.open(textFile, "w") as file:
+        #     file.write(textresult)
 
     def transfer(self, name, local, remote, **kwargs):
         result = super(TransferAndDelete, self).transfer(name, local,
