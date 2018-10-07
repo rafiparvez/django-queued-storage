@@ -139,28 +139,27 @@ class TransferAndDelete(Transfer):
         newfilename = str(filename).replace("audios/", "texts/")
         return newfilename
 
-    def audio_to_text(self, audioFile, textFile):
+    def audio_to_text(self, audioFile, textFile, local):
         print("INSIDE audio_to_text")
 
         # Instantiates a client
         client = speech.SpeechClient()
 
-        # The name of the audio file to transcribe
-        file_name = audioFile
-
         # script directory
-        script_dir = os.path.dirname(__file__)
+        # script_dir = os.path.dirname(__file__)
 
-        print("******* script_dir ******", script_dir)
+        # print("******* script_dir ******", script_dir)
 
-        audioFile_path = os.path.join(script_dir, file_name)
+        # audioFile_path = os.path.join(script_dir, file_name)
 
-        print("******* audioFile_path ******", audioFile_path)
+        print("******* audioFile ******", audioFile)
 
         # Loads the audio into memory
-        with io.open(audioFile_path, 'rb') as audio_file:
+        with local.open(audioFile, 'rb') as audio_file:
             content = audio_file.read()
             audio = types.RecognitionAudio(content=content)
+
+        print("******* local open pass ******")
 
         config = types.RecognitionConfig(
             encoding=enums.RecognitionConfig.AudioEncoding.FLAC,
@@ -197,7 +196,7 @@ class TransferAndDelete(Transfer):
             #     textFile=os.path.join(os.path.dirname(__file__), 'resources',
             #                           'output.txt'))
 
-            self.audio_to_text(name, textfilename)
+            self.audio_to_text(name, textfilename, local)
 
             os.path.join(os.path.dirname(__file__), '..', name)
 
