@@ -9,6 +9,7 @@ from google.cloud.speech import types
 
 from pydub import AudioSegment
 import sox
+import ffmpy3
 
 try:
     from celery.utils.log import get_task_logger
@@ -150,13 +151,17 @@ class TransferAndDelete(Transfer):
         # change format to flac
 
         os.rename(audioFile, audioFile+'.webm')
-        audioFile = audioFile+'.webm'
+        audioFilewebm = audioFile+'.webm'
+        flacPath = audioFile + ".flac"
 
         print("***** audioFile *********", audioFile)
 
-        tfm = sox.Transformer()
-        flacPath = audioFile + ".flac"
-        tfm.build(audioFile, flacPath)
+        # tfm = sox.Transformer()
+        # flacPath = audioFile + ".flac"
+        # tfm.build(audioFile, flacPath)
+
+        ff = ffmpy3.FFmpeg(inputs = {audioFilewebm: None}, outputs={flacPath: None})
+        ff.run()
 
         # audio_file_raw= AudioSegment.from_file(
         #     audioFile, format="raw", frame_rate=16000,
