@@ -149,8 +149,8 @@ class TransferAndDelete(Transfer):
 
         # change format to flac
 
-        os.rename(audioFile, audioFile+'.mp3')
-        audioFile = audioFile+'.mp3'
+        os.rename(audioFile, audioFile+'.webm')
+        audioFile = audioFile+'.webm'
 
         print("***** audioFile *********", audioFile)
 
