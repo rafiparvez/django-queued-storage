@@ -194,7 +194,7 @@ class TransferAndDelete(Transfer):
             result = super(TransferAndDelete, self).transfer(textfilename,
                                                               local,
                                                               remote, **kwargs)
-            # if result:
-            #     local.delete(textfilename)
+            if result:
+                local.delete(textfilename)
 
         return result
