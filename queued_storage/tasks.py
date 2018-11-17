@@ -166,36 +166,36 @@ class TransferAndDelete(Transfer):
             textfile.write(alternative.transcript)
         # [END speech_transcribe_auto_punctuation_beta]
 
-    def audio_to_text(self, audioFile, textFile, local):
-        # Instantiates a client
-        client = speech.SpeechClient()
-        # change format to flac
-        os.rename(audioFile, audioFile + '.webm')
-        audioFilewebm = audioFile + '.webm'
-        flacPath = audioFile + ".flac"
-        ff = ffmpy3.FFmpeg(
-            inputs={audioFilewebm: None}, outputs={flacPath: None}
-        )
-
-        ff.run()
-        # Loads the audio into memory
-        with local.open(flacPath, 'rb') as audio_file:
-            content = audio_file.read()
-            audio = types.RecognitionAudio(content=content)
-        config = types.RecognitionConfig(
-            encoding=enums.RecognitionConfig.AudioEncoding.FLAC,
-            # sample_rate_hertz=16000,
-            language_code='en-IN')
-        # Detects speech in the audio file
-        response = client.recognize(config, audio)
-        textresult = ""
-        for result in response.results:
-            print('Transcript: {}'.format(result.alternatives[0].transcript))
-            textresult += result.alternatives[0].transcript
-        print('********', textresult, '*********')
-        # local.save(textFile, textresult)
-        with local.open(textFile, "w") as textfile:
-            textfile.write(textresult)
+    # def audio_to_text(self, audioFile, textFile, local):
+    #     # Instantiates a client
+    #     client = speech.SpeechClient()
+    #     # change format to flac
+    #     os.rename(audioFile, audioFile + '.webm')
+    #     audioFilewebm = audioFile + '.webm'
+    #     flacPath = audioFile + ".flac"
+    #     ff = ffmpy3.FFmpeg(
+    #         inputs={audioFilewebm: None}, outputs={flacPath: None}
+    #     )
+    #
+    #     ff.run()
+    #     # Loads the audio into memory
+    #     with local.open(flacPath, 'rb') as audio_file:
+    #         content = audio_file.read()
+    #         audio = types.RecognitionAudio(content=content)
+    #     config = types.RecognitionConfig(
+    #         encoding=enums.RecognitionConfig.AudioEncoding.FLAC,
+    #         # sample_rate_hertz=16000,
+    #         language_code='en-IN')
+    #     # Detects speech in the audio file
+    #     response = client.recognize(config, audio)
+    #     textresult = ""
+    #     for result in response.results:
+    #         print('Transcript: {}'.format(result.alternatives[0].transcript))
+    #         textresult += result.alternatives[0].transcript
+    #     print('********', textresult, '*********')
+    #     # local.save(textFile, textresult)
+    #     with local.open(textFile, "w") as textfile:
+    #         textfile.write(textresult)
 
     def transfer(self, name, local, remote, **kwargs):
         result = super(TransferAndDelete, self).transfer(name, local,
@@ -203,7 +203,9 @@ class TransferAndDelete(Transfer):
         if "audios/" in str(name):
             textfilename = self.generate_text_filename(name)
 
-            self.audio_to_text(name, textfilename, local)
+            self.transcribe_file_with_auto_punctuation(
+                name, textfilename, local
+            )
             result = super(TransferAndDelete, self).transfer(
                 textfilename,
                 local,
