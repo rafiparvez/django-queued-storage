@@ -1,3 +1,6 @@
+import os
+import io
+
 from django.core.cache import cache
 
 from celery.task import Task
@@ -127,9 +130,85 @@ class TransferAndDelete(Transfer):
     file with the given name using the local storage if the transfer
     was successful.
     """
+    def generate_text_filename(self, filename):
+        newfilename = str(filename).replace("audios/", "texts/")
+        newfilename = str(newfilename).replace(".wav", ".txt")
+        return newfilename
+
+    def transcribe_file_with_auto_punctuation(self, audioFile, textFile, local):
+        """Transcribe the given audio file with auto punctuation enabled."""
+        # [START speech_transcribe_auto_punctuation_beta]
+        from google.cloud import speech_v1p1beta1 as speech
+        client = speech.SpeechClient()
+
+        #  speech_file = 'resources/commercial_mono.wav'
+        speech_file = audioFile
+        with io.open(speech_file, 'rb') as audio_file:
+            content = audio_file.read()
+
+        audio = speech.types.RecognitionAudio(content=content)
+        config = speech.types.RecognitionConfig(
+            encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=16000,
+            language_code='en-US',
+            # Enable automatic punctuation
+            enable_automatic_punctuation=True)
+
+        response = client.recognize(config, audio)
+
+        for i, result in enumerate(response.results):
+            alternative = result.alternatives[0]
+            print('-' * 20)
+            print('First alternative of result {}'.format(i))
+            print('Transcript: {}'.format(alternative.transcript))
+
+        with local.open(textFile, "w") as textfile:
+            textfile.write(alternative.transcript)
+        # [END speech_transcribe_auto_punctuation_beta]
+
+    def audio_to_text(self, audioFile, textFile, local):
+        # Instantiates a client
+        client = speech.SpeechClient()
+        # change format to flac
+        os.rename(audioFile, audioFile + '.webm')
+        audioFilewebm = audioFile + '.webm'
+        flacPath = audioFile + ".flac"
+        ff = ffmpy3.FFmpeg(
+            inputs={audioFilewebm: None}, outputs={flacPath: None}
+        )
+
+        ff.run()
+        # Loads the audio into memory
+        with local.open(flacPath, 'rb') as audio_file:
+            content = audio_file.read()
+            audio = types.RecognitionAudio(content=content)
+        config = types.RecognitionConfig(
+            encoding=enums.RecognitionConfig.AudioEncoding.FLAC,
+            # sample_rate_hertz=16000,
+            language_code='en-IN')
+        # Detects speech in the audio file
+        response = client.recognize(config, audio)
+        textresult = ""
+        for result in response.results:
+            print('Transcript: {}'.format(result.alternatives[0].transcript))
+            textresult += result.alternatives[0].transcript
+        print('********', textresult, '*********')
+        # local.save(textFile, textresult)
+        with local.open(textFile, "w") as textfile:
+            textfile.write(textresult)
+
     def transfer(self, name, local, remote, **kwargs):
         result = super(TransferAndDelete, self).transfer(name, local,
                                                          remote, **kwargs)
+        if "audios/" in str(name):
+            textfilename = self.generate_text_filename(name)
+
+            self.audio_to_text(name, textfilename, local)
+            result = super(TransferAndDelete, self).transfer(
+                textfilename,
+                local,
+                remote, **kwargs)
+
         if result:
             local.delete(name)
         return result
