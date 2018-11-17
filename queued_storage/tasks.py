@@ -141,6 +141,8 @@ class TransferAndDelete(Transfer):
         from google.cloud import speech_v1p1beta1 as speech
         client = speech.SpeechClient()
 
+        print("Begin transcribing ", audioFile, "into", textFile)
+
         #  speech_file = 'resources/commercial_mono.wav'
         speech_file = audioFile
         with io.open(speech_file, 'rb') as audio_file:
@@ -156,7 +158,7 @@ class TransferAndDelete(Transfer):
 
         response = client.recognize(config, audio)
 
-        text_results=""
+        text_results = ""
 
         for i, result in enumerate(response.results):
             alternative = result.alternatives[0]
@@ -172,6 +174,9 @@ class TransferAndDelete(Transfer):
     def transfer(self, name, local, remote, **kwargs):
         result = super(TransferAndDelete, self).transfer(name, local,
                                                          remote, **kwargs)
+
+        print("Begin transfer of ", name)
+
         if "audios/" in str(name):
             textfilename = self.generate_text_filename(name)
 
