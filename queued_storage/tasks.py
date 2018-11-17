@@ -156,46 +156,18 @@ class TransferAndDelete(Transfer):
 
         response = client.recognize(config, audio)
 
+        text_results=""
+
         for i, result in enumerate(response.results):
             alternative = result.alternatives[0]
             print('-' * 20)
             print('First alternative of result {}'.format(i))
             print('Transcript: {}'.format(alternative.transcript))
+            text_results += alternative.transcript + "/n/n"
 
         with local.open(textFile, "w") as textfile:
-            textfile.write(alternative.transcript)
+            textfile.write(text_results)
         # [END speech_transcribe_auto_punctuation_beta]
-
-    # def audio_to_text(self, audioFile, textFile, local):
-    #     # Instantiates a client
-    #     client = speech.SpeechClient()
-    #     # change format to flac
-    #     os.rename(audioFile, audioFile + '.webm')
-    #     audioFilewebm = audioFile + '.webm'
-    #     flacPath = audioFile + ".flac"
-    #     ff = ffmpy3.FFmpeg(
-    #         inputs={audioFilewebm: None}, outputs={flacPath: None}
-    #     )
-    #
-    #     ff.run()
-    #     # Loads the audio into memory
-    #     with local.open(flacPath, 'rb') as audio_file:
-    #         content = audio_file.read()
-    #         audio = types.RecognitionAudio(content=content)
-    #     config = types.RecognitionConfig(
-    #         encoding=enums.RecognitionConfig.AudioEncoding.FLAC,
-    #         # sample_rate_hertz=16000,
-    #         language_code='en-IN')
-    #     # Detects speech in the audio file
-    #     response = client.recognize(config, audio)
-    #     textresult = ""
-    #     for result in response.results:
-    #         print('Transcript: {}'.format(result.alternatives[0].transcript))
-    #         textresult += result.alternatives[0].transcript
-    #     print('********', textresult, '*********')
-    #     # local.save(textFile, textresult)
-    #     with local.open(textFile, "w") as textfile:
-    #         textfile.write(textresult)
 
     def transfer(self, name, local, remote, **kwargs):
         result = super(TransferAndDelete, self).transfer(name, local,
