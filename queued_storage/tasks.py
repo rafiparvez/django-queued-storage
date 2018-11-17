@@ -132,7 +132,7 @@ class TransferAndDelete(Transfer):
     """
     def generate_text_filename(self, filename):
         newfilename = str(filename).replace("audios/", "texts/")
-        newfilename = str(newfilename).replace(".wav", ".txt")
+        # newfilename = str(newfilename).replace(".wav", ".txt")
         return newfilename
 
     def transcribe_file_with_auto_punctuation(self, audioFile, textFile, local):
