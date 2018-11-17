@@ -190,7 +190,7 @@ class QueuedStorage(object):
 
         # Use a name that is available on both the local and remote storage
         # systems and save locally.
-        name = self.get_available_name(name)
+        # name = self.get_available_name(name)
         try:
             name = self.local.save(name, content, max_length=max_length)
         except TypeError:
@@ -229,7 +229,9 @@ class QueuedStorage(object):
         :type name: str
         :rtype: str
         """
+        print("BEFORE get_valida_name", name)
         return self.get_storage(name).get_valid_name(name)
+        print("After get_valida_name", self.get_storage(name).get_valid_name(name))
 
     def get_available_name(self, name):
         """
