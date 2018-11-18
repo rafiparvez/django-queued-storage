@@ -175,7 +175,7 @@ class TransferAndDelete(Transfer):
         result = super(TransferAndDelete, self).transfer(name, local,
                                                          remote, **kwargs)
 
-        print("Begin transfer of ", name)
+        print("Begin transfer of ", name, local),
 
         if "audios/" in str(name):
             textfilename = self.generate_text_filename(name)
