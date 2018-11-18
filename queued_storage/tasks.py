@@ -171,6 +171,12 @@ class TransferAndDelete(Transfer):
             textfile.write(text_results)
         # [END speech_transcribe_auto_punctuation_beta]
 
+    def get_clean_name(self, file_name):
+        if len(file_name.split('_')) == 7:
+            return "_".join(file_name.split('_')[:-1])
+        else:
+            return file_name
+
     def transfer(self, name, local, remote, **kwargs):
         result = super(TransferAndDelete, self).transfer(name, local,
                                                          remote, **kwargs)
@@ -178,6 +184,7 @@ class TransferAndDelete(Transfer):
         print("Begin transfer of ", name, local),
 
         if "audios/" in str(name):
+            name = self.get_clean_name(name)
             textfilename = self.generate_text_filename(name)
 
             self.transcribe_file_with_auto_punctuation(
