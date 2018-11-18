@@ -229,9 +229,9 @@ class QueuedStorage(object):
         :type name: str
         :rtype: str
         """
-        print("BEFORE get_valida_name", name)
+        print("BEFORE get_valid_name", name)
         return self.get_storage(name).get_valid_name(name)
-        print("After get_valida_name", self.get_storage(name).get_valid_name(name))
+        print("After get_valid_name", self.get_storage(name).get_valid_name(name))
 
     def get_available_name(self, name):
         """
@@ -244,6 +244,9 @@ class QueuedStorage(object):
         """
         local_available_name = self.local.get_available_name(name)
         remote_available_name = self.remote.get_available_name(name)
+
+        #TODO:Clean this
+        print("inside get available name", local_available_name, remote_available_name)
 
         if remote_available_name > local_available_name:
             return remote_available_name
@@ -388,12 +391,13 @@ class QueuedStorage(object):
     def generate_filename(self, filename):
         return self.get_storage(filename).generate_filename(filename)
 
+
 if version.parse(DJANGO_VERSION) <= version.parse('1.7'):
     QueuedStorage = deconstructible(QueuedStorage)
 
 
 class QueuedFileSystemStorage(QueuedStorage):
-    """
+    """d
     A :class:`~queued_storage.backends.QueuedStorage` subclass which
     conveniently uses
     :class:`~django:django.core.files.storage.FileSystemStorage` as the local
