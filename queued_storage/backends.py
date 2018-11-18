@@ -192,14 +192,11 @@ class QueuedStorage(object):
         # systems and save locally.
         # name = self.get_available_name(name)
 
-        print("before save", name)
         try:
             name = self.local.save(name, content, max_length=max_length)
         except TypeError:
             # Django < 1.10
             name = self.local.save(name, content)
-
-        print("After save", name)
 
         # Pass on the cache key to prevent duplicate cache key creation,
         # we save the result in the storage to be able to test for it
@@ -221,7 +218,6 @@ class QueuedStorage(object):
         if cache_key is None:
             cache_key = self.get_cache_key(name)
 
-        print("Before transfer", name)
         return self.task.delay(name, cache_key,
                                self.local_path, self.remote_path,
                                self.local_options, self.remote_options)
@@ -235,9 +231,7 @@ class QueuedStorage(object):
         :type name: str
         :rtype: str
         """
-        print("BEFORE get_valid_name", name)
         return self.get_storage(name).get_valid_name(name)
-        print("After get_valid_name", self.get_storage(name).get_valid_name(name))
 
     def get_available_name(self, name):
         """
@@ -250,9 +244,6 @@ class QueuedStorage(object):
         """
         local_available_name = self.local.get_available_name(name)
         remote_available_name = self.remote.get_available_name(name)
-
-        #TODO:Clean this
-        print("inside get available name", local_available_name, remote_available_name)
 
         if remote_available_name > local_available_name:
             return remote_available_name

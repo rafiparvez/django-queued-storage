@@ -141,7 +141,7 @@ class TransferAndDelete(Transfer):
         from google.cloud import speech_v1p1beta1 as speech
         client = speech.SpeechClient()
 
-        print("Begin transcribing ", audioFile, "into", textFile)
+        print("Begin transcribing {0} into {1}".format(audioFile, textFile))
 
         #  speech_file = 'resources/commercial_mono.wav'
         speech_file = audioFile
@@ -152,7 +152,7 @@ class TransferAndDelete(Transfer):
         config = speech.types.RecognitionConfig(
             encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
-            language_code='en-US',
+            language_code='en-IN',
             # Enable automatic punctuation
             enable_automatic_punctuation=True)
 
