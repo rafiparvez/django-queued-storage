@@ -152,7 +152,7 @@ class TransferAndDelete(Transfer):
         config = speech.types.RecognitionConfig(
             encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
-            language_code='en-IN',
+            language_code='en-US',
             # Enable automatic punctuation
             enable_automatic_punctuation=True)
 
