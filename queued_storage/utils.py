@@ -1,6 +1,10 @@
 from importlib import import_module
-
+import six
 from django.core.exceptions import ImproperlyConfigured
+from google.cloud import storage
+
+
+CLOUD_STORAGE_BUCKET = 'irene-ai'
 
 
 def import_attribute(import_path=None, options=None):
@@ -21,5 +25,24 @@ def import_attribute(import_path=None, options=None):
     except AttributeError:
         raise ImproperlyConfigured(
             'Module "%s" does not define a "%s" class.' % (module, classname))
+
+
+def upload_file_to_gcs(filename):
+    """
+    Uploads a file to a given Cloud Storage bucket and returns the public url
+    to the new object.
+    """
+
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(CLOUD_STORAGE_BUCKET)
+
+    blob = bucket.blob(filename)
+    blob.upload_from_filename(filename)
+
+    url = blob.public_url
+
+    if isinstance(url, six.binary_type):
+        url = url.decode('utf-8')
+    return url
 
 

@@ -12,7 +12,7 @@ except ImportError:
 
 from .conf import settings
 from .signals import file_transferred
-from .utils import import_attribute
+from .utils import import_attribute, upload_file_to_gcs
 
 logger = get_task_logger(name=__name__)
 
@@ -144,11 +144,14 @@ class TransferAndDelete(Transfer):
         print("Begin transcribing {0} into {1}".format(audioFile, textFile))
 
         #  speech_file = 'resources/commercial_mono.wav'
-        speech_file = audioFile
-        with io.open(speech_file, 'rb') as audio_file:
-            content = audio_file.read()
+        # speech_file = audioFile
+        # with io.open(speech_file, 'rb') as audio_file:
+        #     content = audio_file.read()
 
-        audio = speech.types.RecognitionAudio(content=content)
+        gcs_uri = upload_file_to_gcs(audioFile)
+
+        # audio = speech.types.RecognitionAudio(content=content)
+        audio = speech.types.RecognitionAudio(uri=gcs_uri)
         config = speech.types.RecognitionConfig(
             encoding=speech.enums.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
@@ -165,7 +168,7 @@ class TransferAndDelete(Transfer):
             print('-' * 20)
             print('First alternative of result {}'.format(i))
             print('Transcript: {}'.format(alternative.transcript))
-            text_results += alternative.transcript + "/n/n"
+            text_results += alternative.transcript + '\n'
 
         with local.open(textFile, "w") as textfile:
             textfile.write(text_results)
@@ -178,8 +181,7 @@ class TransferAndDelete(Transfer):
             return file_name
 
     def transfer(self, name, local, remote, **kwargs):
-        result = super(TransferAndDelete, self).transfer(name, local,
-                                                         remote, **kwargs)
+        result = super(TransferAndDelete, self).transfer(name, local, remote, **kwargs)
 
         print("Begin transfer of ", name, local),
 
