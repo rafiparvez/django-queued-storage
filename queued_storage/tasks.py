@@ -159,7 +159,10 @@ class TransferAndDelete(Transfer):
             # Enable automatic punctuation
             enable_automatic_punctuation=True)
 
-        response = client.recognize(config, audio)
+        # response = client.recognize(config, audio)
+        operation = client.long_running_recognize(config, audio)
+        print('Waiting for operation to complete...')
+        response = operation.result(timeout=90)
 
         text_results = ""
 
