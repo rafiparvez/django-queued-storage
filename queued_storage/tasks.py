@@ -161,11 +161,11 @@ class TransferAndDelete(Transfer):
         config = types.RecognitionConfig(
             encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
-            language_code='en-US',
+            language_code='en-IN',
+            # enable_automatic_punctuation=True,
             speech_contexts=[speech.types.SpeechContext(
                 phrases=['Birchbox', 'view based'],
-            )],
-            enable_automatic_punctuation=True)
+            )])
 
         # response = client.recognize(config, audio)
         operation = client.long_running_recognize(config, audio)
