@@ -39,7 +39,8 @@ def upload_file_to_gcs(filename):
     blob = bucket.blob(filename)
     blob.upload_from_filename(filename)
 
-    url = blob.public_url
+    # url = blob.public_url
+    url = "gs://"+CLOUD_STORAGE_BUCKET+"/"+filename
 
     if isinstance(url, six.binary_type):
         url = url.decode('utf-8')
