@@ -135,53 +135,6 @@ class TransferAndDelete(Transfer):
         # newfilename = str(newfilename).replace(".wav", ".txt")
         return newfilename
 
-    def transcribe_file_with_auto_punctuation(self, audioFile):
-        """Transcribe the given audio file with auto punctuation enabled."""
-        # [START speech_transcribe_auto_punctuation_beta]
-        # from google.cloud import speech_v1p1beta1 as speech
-        from google.cloud import speech
-        from google.cloud.speech import enums
-        from google.cloud.speech import types
-
-        client = speech.SpeechClient()
-
-        print("Begin transcribing {0}".format(audioFile))
-
-        #  speech_file = 'resources/commercial_mono.wav'
-        # speech_file = audioFile
-        # with io.open(speech_file, 'rb') as audio_file:
-        #     content = audio_file.read()
-
-        gcs_uri = upload_file_to_gcs(audioFile)
-        print("Uploaded file at {0}".format(gcs_uri))
-
-        # audio = speech.types.RecognitionAudio(content=content)
-        audio = types.RecognitionAudio(uri=gcs_uri)
-
-        config = types.RecognitionConfig(
-            encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
-            sample_rate_hertz=16000,
-            language_code='en-IN',
-            # enable_automatic_punctuation=True,
-            speech_contexts=[speech.types.SpeechContext(
-                phrases=['Birchbox', 'view based'],
-            )])
-
-        # response = client.recognize(config, audio)
-        operation = client.long_running_recognize(config, audio)
-        print('Waiting for operation to complete...')
-        response = operation.result(timeout=90)
-
-        text_results = ""
-
-        for i, result in enumerate(response.results):
-            alternative = result.alternatives[0]
-            print('-' * 20)
-            print('First alternative of result {}'.format(i))
-            print('Transcript: {}'.format(alternative.transcript))
-            text_results += alternative.transcript + '\n'
-        return text_results
-
 
         # [END speech_transcribe_auto_punctuation_beta]
 
@@ -196,20 +149,9 @@ class TransferAndDelete(Transfer):
 
         print("Begin transfer of {0}".format(name))
 
-        if "audios/" in str(name):
+        if "texts/" in str(name):
             name = self.get_clean_name(name)
-            textfilename = self.generate_text_filename(name)
-
-            text_results = self.transcribe_file_with_auto_punctuation(name)
-
-            print("Writing transcribed text to {0}".format(textfilename))
-            with local.open(textfilename, "w") as textfile:
-                textfile.write(text_results)
-
-            result = super(TransferAndDelete, self).transfer(
-                textfilename,
-                local,
-                remote, **kwargs)
+            # textfilename = self.generate_text_filename(name)
 
         if result:
             local.delete(name)
