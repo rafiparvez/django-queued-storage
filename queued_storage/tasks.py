@@ -12,7 +12,11 @@ except ImportError:
 
 from .conf import settings
 from .signals import file_transferred
-from .utils import import_attribute, upload_file_to_gcs
+from .utils import (
+    import_attribute,
+    convert_webm,
+    transcribe_long_file_with_auto_punctuation,
+    punctuate_text)
 
 logger = get_task_logger(name=__name__)
 
@@ -134,25 +138,36 @@ class TransferAndDelete(Transfer):
         newfilename = str(filename).replace("audios/", "texts/")
         # newfilename = str(newfilename).replace(".wav", ".txt")
         return newfilename
-
-
         # [END speech_transcribe_auto_punctuation_beta]
 
+    # function to remove arbitrary character after filename. The
+    # correct filename should be interview_7_candidate_5_question_8_lang_en-US
     def get_clean_name(self, file_name):
-        if len(file_name.split('_')) == 7:
+        if len(file_name.split('_')) == 9:
             return "_".join(file_name.split('_')[:-1])
         else:
             return file_name
 
     def transfer(self, name, local, remote, **kwargs):
         result = super(TransferAndDelete, self).transfer(name, local, remote, **kwargs)
+        name = self.get_clean_name(name)
+        lang_code = name.split("_")[-1]
 
         print("Begin transfer of {0}".format(name))
 
         if "texts/" in str(name):
-            name = self.get_clean_name(name)
-            # textfilename = self.generate_text_filename(name)
+            if lang_code.lower != 'en-us':
+                with open(name, 'r') as myfile:
+                    raw_text = myfile.read()
+                audio_file_name = name.replace("texts/", "audios/")
+                flac_file_path = convert_webm(audio_file_name)
+                punct_text_output = transcribe_long_file_with_auto_punctuation(flac_file_path, 'en-US')
+                new_text = punctuate_text(raw_text, punct_text_output)
 
-        if result:
-            local.delete(name)
+                # Write the file again
+                with open(name, 'w') as file:
+                    file.write(new_text)
+
+        # if result:
+        #     local.delete(name)
         return result
