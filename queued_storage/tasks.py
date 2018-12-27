@@ -12,11 +12,7 @@ except ImportError:
 
 from .conf import settings
 from .signals import file_transferred
-from .utils import (
-    import_attribute,
-    convert_webm,
-    transcribe_long_file_with_auto_punctuation,
-    punctuate_text)
+from .utils import import_attribute
 
 logger = get_task_logger(name=__name__)
 
@@ -155,19 +151,19 @@ class TransferAndDelete(Transfer):
 
         print("Begin transfer of {0}".format(name))
 
-        if "texts/" in str(name):
-            if lang_code.lower != 'en-us':
-                with open(name, 'r') as myfile:
-                    raw_text = myfile.read()
-                audio_file_name = name.replace("texts/", "audios/")
-                flac_file_path = convert_webm(audio_file_name)
-                punct_text_output = transcribe_long_file_with_auto_punctuation(flac_file_path, 'en-US')
-                new_text = punctuate_text(raw_text, punct_text_output)
+        # if "texts/" in str(name):
+        #     if lang_code.lower != 'en-us':
+        #         with open(name, 'r') as myfile:
+        #             raw_text = myfile.read()
+        #         audio_file_name = name.replace("texts/", "audios/")
+        #         flac_file_path = convert_webm(audio_file_name)
+        #         punct_text_output = transcribe_long_file_with_auto_punctuation(flac_file_path, 'en-US')
+        #         new_text = punctuate_text(raw_text, punct_text_output)
+        #
+        #         # Write the file again
+        #         with open(name, 'w') as file:
+        #             file.write(new_text)
 
-                # Write the file again
-                with open(name, 'w') as file:
-                    file.write(new_text)
-
-        # if result:
-        #     local.delete(name)
+        if result:
+            local.delete(name)
         return result
