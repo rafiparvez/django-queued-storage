@@ -145,11 +145,10 @@ class TransferAndDelete(Transfer):
             return file_name
 
     def transfer(self, name, local, remote, **kwargs):
-        result = super(TransferAndDelete, self).transfer(name, local, remote, **kwargs)
         name = self.get_clean_name(name)
-        lang_code = name.split("_")[-1]
-
         print("Begin transfer of {0}".format(name))
+        result = super(TransferAndDelete, self).transfer(name, local, remote, **kwargs)
+        # lang_code = name.split("_")[-1]
 
         # if "texts/" in str(name):
         #     if lang_code.lower != 'en-us':
