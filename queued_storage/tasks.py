@@ -148,21 +148,6 @@ class TransferAndDelete(Transfer):
         name = self.get_clean_name(name)
         print("Begin transfer of {0}".format(name))
         result = super(TransferAndDelete, self).transfer(name, local, remote, **kwargs)
-        # lang_code = name.split("_")[-1]
-
-        # if "texts/" in str(name):
-        #     if lang_code.lower != 'en-us':
-        #         with open(name, 'r') as myfile:
-        #             raw_text = myfile.read()
-        #         audio_file_name = name.replace("texts/", "audios/")
-        #         flac_file_path = convert_webm(audio_file_name)
-        #         punct_text_output = transcribe_long_file_with_auto_punctuation(flac_file_path, 'en-US')
-        #         new_text = punctuate_text(raw_text, punct_text_output)
-        #
-        #         # Write the file again
-        #         with open(name, 'w') as file:
-        #             file.write(new_text)
-
         if result:
             local.delete(name)
         return result
