@@ -2,8 +2,16 @@ import os
 import io
 
 from django.core.cache import cache
-
 from celery.task import Task
+
+import logging
+
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S')
+
+
 try:
     from celery.utils.log import get_task_logger
 except ImportError:
@@ -146,8 +154,10 @@ class TransferAndDelete(Transfer):
 
     def transfer(self, name, local, remote, **kwargs):
         name = self.get_clean_name(name)
-        print("Begin transfer of {0}".format(name))
+        # print("Begin transfer of {0}".format(name))
+        logging.info("Begin transfer of {0}".format(name))
         result = super(TransferAndDelete, self).transfer(name, local, remote, **kwargs)
         if result:
             local.delete(name)
+        logging.info("Completed transfer of {0}".format(name))
         return result
